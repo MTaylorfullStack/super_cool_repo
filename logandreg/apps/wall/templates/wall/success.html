@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Success!</title>
+    <style>
+        * {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+        }
+
+        #messages {
+            display: block;
+            margin: 50px;
+        }
+
+        .message {
+            display: block;
+            margin: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hello {{request.session.user}}, You Have Logged In!</h1>
+    <a href="/logout">Logout</a>
+
+
+    <p>Make A Post: </p>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+    </ul>
+    {% endif %}
+    <form method="POST" action='/wall/add_new_message'>
+        {% csrf_token %}
+        <input type='textbox' name='message'>
+        <input type='submit' value="Post">
+    </form>
+
+
+    <div id='messages'>
+
+        {% for message in all_messages %}
+
+        <div class=message>
+            {{message.message}}
+            <br>By: {{message.poster.first_name}}
+            <br> {{message.created_at}}
+            <a href="/wall/edit/{{message.id}}">Edit Message</a>
+            <a href="/wall/delete/{{message.id}}">Delete Message</a>
+            <a href="/wall/like/{{message.id}}">Like</a>
+            <a href="/wall/view/{{message.id}}">View</a>
+            <p>Number of likes: {{message.likes.count}}</p>
+            <form method=POST action='/wall/add_new_comment/{{message.id}}'>
+                {% csrf_token %}
+                Post a Comment: <input type='textbox' name='comment'>
+                <input type='submit' value='Post'>
+            </form>
+
+            {% for comment in message.comments.all %}
+            {{comment.comment}}
+            {{comment.poster.first_name}}
+            {{comment.created_at}}
+            {% endfor %}
+
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+</body>
+
+
+</html>
